@@ -41,24 +41,24 @@ class QwenSentenceTransformerEmbedder(BaseEmbedder):
     
     def __init__(self, model_name: str = "Qwen/Qwen3-Embedding-4B"):
         try:
-            print(f"🔄 Loading {model_name} with sentence-transformers...")
+            print(f"Loading {model_name} with sentence-transformers...")
             self.model = SentenceTransformer(
                 model_name,
                 model_kwargs={"torch_dtype": "auto", "device_map": "auto"},
                 tokenizer_kwargs={"padding_side": "left", "max_length": 2048, "truncation": True}
             )
-            print(f"✅ Successfully loaded {model_name}")
+            print(f"Successfully loaded {model_name}")
         except Exception as e:
-            print(f"❌ Failed to load {model_name}: {e}")
+            print(f"Failed to load {model_name}: {e}")
             raise
 
     def embed_documents(self, texts: List[str], batch_size: int = 8, normalize: bool = True) -> List[List[float]]:
         """Encode texts into embeddings."""
         try:
-            print(f"🔍 Processing {len(texts)} texts with batch_size={batch_size}")
+            print(f"Processing {len(texts)} texts with batch_size={batch_size}")
             
             if torch.cuda.is_available():
-                print(f"🎮 GPU: {torch.cuda.memory_allocated() / 1024**3:.1f}GB allocated")
+                print(f"GPU: {torch.cuda.memory_allocated() / 1024**3:.1f}GB allocated")
             
             start_time = time.time()
             embeddings = self.model.encode(
@@ -70,13 +70,13 @@ class QwenSentenceTransformerEmbedder(BaseEmbedder):
                 show_progress_bar=True
             )
             
-            print(f"🎯 Embedding completed in {time.time() - start_time:.3f}s")
+            print(f"Embedding completed in {time.time() - start_time:.3f}s")
             
             self._clear_gpu_cache()
             return embeddings.tolist()
             
         except Exception as e:
-            print(f"❌ Embedding failed: {e}")
+            print(f"Embedding failed: {e}")
             self._clear_gpu_cache()
             raise
 
@@ -173,6 +173,6 @@ class EmbeddingModelFactory:
                 raise ValueError(f'Unsupported model: {model_name}')
                 
         except Exception as e:
-            print(f"❌ Error loading embedding model: {e}")
+            print(f"Error loading embedding model: {e}")
             raise
 

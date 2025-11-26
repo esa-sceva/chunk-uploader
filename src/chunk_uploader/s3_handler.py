@@ -30,7 +30,7 @@ class S3ChunkHandler:
         bucket = path_parts[0]
         prefix = path_parts[1] if len(path_parts) > 1 else ''
         
-        print(f"📂 Listing files from s3://{bucket}/{prefix}")
+        print(f"Listing files from s3://{bucket}/{prefix}")
         
         chunks = []
         
@@ -68,11 +68,11 @@ class S3ChunkHandler:
                     
                     chunks.append(chunk)
             
-            print(f"✅ Found {len(chunks)} chunk files in S3")
+            print(f"Found {len(chunks)} chunk files in S3")
             return chunks
             
         except ClientError as e:
-            print(f"❌ Error accessing S3: {e}")
+            print(f"Error accessing S3: {e}")
             raise
     
     def download_file(self, s3_uri: str, local_dir: str = "downloads") -> Optional[str]:
@@ -87,7 +87,7 @@ class S3ChunkHandler:
             self.s3_client.download_file(bucket, key, local_path)
             return local_path
         except Exception as e:
-            print(f"⚠️ Error downloading {s3_uri}: {e}")
+            print(f"Error downloading {s3_uri}: {e}")
             return None
 
 
@@ -98,4 +98,3 @@ class DirectS3ChunkMetadata:
         self.uid = uid
         self.s3_uri = s3_uri
         self.metadata = metadata
-

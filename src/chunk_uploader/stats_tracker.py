@@ -96,35 +96,35 @@ class StatsTracker:
                 f.flush()
                 os.fsync(f.fileno())
         except Exception as e:
-            print(f"⚠️ Could not write stats file: {e}")
+            print(f"Could not write stats file: {e}")
     
     def print_summary(self):
         """Print final statistics summary."""
-        print(f"\n📝 Stats file: {self.stats_path}")
-        print(f"📊 Final upload summary:")
-        print(f"   📈 Total chunks found: {self.total_chunks}")
-        print(f"   ⏭️ Skipped chunks: {self.total_skipped}")
-        print(f"   🚫 Filtered by score threshold ({self.score_threshold}): {self.total_filtered}")
+        print(f"\nStats file: {self.stats_path}")
+        print(f"Final upload summary:")
+        print(f"Total chunks found: {self.total_chunks}")
+        print(f"Skipped chunks: {self.total_skipped}")
+        print(f"Filtered by score threshold ({self.score_threshold}): {self.total_filtered}")
         
         available = self.total_chunks - self.total_skipped - self.total_filtered
-        print(f"   ⚡ Available for processing: {available}")
-        print(f"   🎯 Successfully uploaded to Qdrant: {self.total_uploaded}")
-        print(f"   ❌ Failed uploads: {self.failed}")
+        print(f"Available for processing: {available}")
+        print(f"Successfully uploaded to Qdrant: {self.total_uploaded}")
+        print(f"Failed uploads: {self.failed}")
         
         success_rate = (self.total_uploaded / max(1, available)) * 100
-        print(f"   📊 Upload success rate: {success_rate:.1f}%")
+        print(f"Upload success rate: {success_rate:.1f}%")
     
     def print_validation(self):
         """Print validation checks."""
-        print(f"\n🔍 VALIDATION CHECKS:")
+        print(f"\nVALIDATION CHECKS:")
         expected_available = self.total_chunks - self.total_skipped - self.total_filtered
         print(f"   ✓ Available chunks: {self.total_chunks} - {self.total_skipped} - {self.total_filtered} = {expected_available}")
         print(f"   ✓ Processed chunks: {self.processed} {'✅' if self.processed <= expected_available else '❌ MISMATCH!'}")
         print(f"   ✓ Success + Failure: {self.total_uploaded} + {self.failed} = {self.total_uploaded + self.failed} {'✅' if (self.total_uploaded + self.failed) == self.processed else '❌ MISMATCH!'}")
         
-        print(f"\n📁 PER-FILE VALIDATION:")
+        print(f"\nPER-FILE VALIDATION:")
         for fname, fstats in self.per_file_stats.items():
-            print(f"   📄 {fname}:")
+            print(f"{fname}:")
             print(f"      Total: {fstats['total_chunks']}, Filtered: {fstats['filtered_chunks']}, Available: {fstats['available_for_processing']}")
             print(f"      Processed: {fstats['processed']}, Succeeded: {fstats['succeeded']}, Failed: {fstats['failed']}")
 

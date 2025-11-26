@@ -130,7 +130,7 @@ def example_gpu_management():
     
     # Check if CUDA is available
     if gpu.is_available():
-        print("✅ CUDA is available")
+        print("CUDA is available")
         
         # Get device info
         info = gpu.get_device_info()
@@ -148,7 +148,7 @@ def example_gpu_management():
         if gpu.check_and_clear_if_needed():
             print("Cache cleared due to high memory usage")
     else:
-        print("⚠️ CUDA not available")
+        print("CUDA not available")
 
 
 def example_environment_config():
@@ -228,9 +228,9 @@ def example_custom_workflow():
     success, failed = uploader.upload_batch(batch_ids, embeddings, batch_metadata)
     
     if success:
-        print(f"✅ Successfully uploaded {len(batch_ids)} vectors")
+        print(f"Successfully uploaded {len(batch_ids)} vectors")
     else:
-        print(f"❌ Failed to upload {len(failed or [])} vectors")
+        print(f"Failed to upload {len(failed or [])} vectors")
 
 
 if __name__ == "__main__":

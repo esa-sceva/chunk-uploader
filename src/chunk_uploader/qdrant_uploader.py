@@ -34,10 +34,10 @@ class QdrantUploader:
         try:
             collection_info = self.client.get_collection(self.collection_name)
             point_count = collection_info.points_count
-            print(f"📊 Collection '{self.collection_name}' status: {point_count} points")
+            print(f"Collection '{self.collection_name}' status: {point_count} points")
             return True
         except Exception as e:
-            print(f"❌ Collection access error: {e}")
+            print(f"Collection access error: {e}")
             return False
     
     def upload_batch(self, batch_ids: List[str], batch_vectors: List[List[float]], 
@@ -71,12 +71,12 @@ class QdrantUploader:
                 
                 if is_retryable and attempt < self.max_retries - 1:
                     delay = self.retry_delay_base * (2 ** attempt) + np.random.uniform(0, 2)
-                    print(f"   ⏳ Upload error (attempt {attempt + 1}/{self.max_retries})")
-                    print(f"   ⏰ Retrying in {delay:.2f}s... Error: {e}")
+                    print(f"Upload error (attempt {attempt + 1}/{self.max_retries})")
+                    print(f"Retrying in {delay:.2f}s... Error: {e}")
                     time.sleep(delay)
                     continue
                 else:
-                    print(f"   ❌ Upload failed: {e}")
+                    print(f"Upload failed: {e}")
                     return False, batch_ids
         
         return False, batch_ids
@@ -87,7 +87,7 @@ class QdrantUploader:
             if force:
                 try:
                     self.client.delete_collection(self.collection_name)
-                    print(f"🗑️ Deleted existing collection")
+                    print(f"Deleted existing collection")
                 except:
                     pass
             
@@ -98,9 +98,9 @@ class QdrantUploader:
                     distance=models.Distance.COSINE if distance == "COSINE" else models.Distance.EUCLIDEAN
                 )
             )
-            print(f"✅ Created collection '{self.collection_name}' with vector size {vector_size}")
+            print(f"Created collection '{self.collection_name}' with vector size {vector_size}")
             
         except Exception as e:
-            print(f"❌ Error creating collection: {e}")
+            print(f"Error creating collection: {e}")
             raise
 

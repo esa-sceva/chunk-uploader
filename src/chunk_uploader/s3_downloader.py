@@ -24,7 +24,7 @@ class S3Downloader:
             self.s3_client.download_file(bucket, key, local_path)
             return local_path
         except Exception as e:
-            print(f"⚠️ Error downloading {s3_uri}: {e}")
+            print(f"Error downloading {s3_uri}: {e}")
             return None
     
     def download_batch(self, s3_uris: List[str], local_dir: str = "downloads") -> Dict[str, str]:
@@ -45,9 +45,9 @@ class S3Downloader:
                 try:
                     uri, local_path = future.result()
                     if local_path:
-                        print(f"⬇️ Downloaded {uri}")
+                        print(f"Downloaded {uri}")
                 except Exception as e:
-                    print(f"⚠️ Error downloading {s3_uri}: {e}")
+                    print(f"Error downloading {s3_uri}: {e}")
         
         return downloaded_files
 
@@ -59,5 +59,5 @@ def cleanup_files(file_paths: List[str]):
             if os.path.isfile(p):
                 os.remove(p)
         except Exception as e:
-            print(f"⚠️ Could not delete {p}: {e}")
+            print(f"Could not delete {p}: {e}")
 

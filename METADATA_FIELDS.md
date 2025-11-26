@@ -47,7 +47,7 @@ When chunks are uploaded to Qdrant, the following metadata fields are automatica
   "chunk_name": "chunk_001.md",
   "original_file_name": "document.pdf",
   "sub_folder": "arxiv",
-  "url": "https://arxiv.org/abs/1234.5678",
+  "url": "https://arxiv.org/abcd/1234.5678",
   "publisher": "arxiv",
   "source_json_file": "arxiv.json",
   "score": 0.95,

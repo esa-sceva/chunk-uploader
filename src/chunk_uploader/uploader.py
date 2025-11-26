@@ -345,7 +345,7 @@ class ChunkUploader:
     
     def upload_from_s3(self, s3_path: str):
         """Upload chunks directly from S3 path without metadata files."""
-        print(f"🚀 Starting direct S3 upload")
+        print(f"Starting direct S3 upload")
         print(f"   S3 path: {s3_path}")
         print(f"   Collection: {self.config.database.collection_name}")
         print(f"   Batch size: {self.config.upload.batch_size}")
@@ -353,7 +353,7 @@ class ChunkUploader:
         
         # Check collection health
         if not self.uploader.check_collection_health():
-            print("❌ Collection health check failed")
+            print("Collection health check failed")
             return
         
         self.gpu_manager.print_memory_stats("Initial")
@@ -363,14 +363,14 @@ class ChunkUploader:
         try:
             chunks = s3_handler.list_chunks_from_s3(s3_path)
         except Exception as e:
-            print(f"❌ Failed to list S3 files: {e}")
+            print(f"Failed to list S3 files: {e}")
             return
         
         if not chunks:
-            print("❌ No chunk files found in S3 path")
+            print("No chunk files found in S3 path")
             return
         
-        print(f"📊 Found {len(chunks)} chunk files")
+        print(f"Found {len(chunks)} chunk files")
         
         # Convert to ChunkMetadata objects
         chunk_metadata = [
@@ -392,14 +392,14 @@ class ChunkUploader:
             subset = chunk_metadata[subset_idx:subset_idx + subset_size]
             subset_num = subset_idx // subset_size + 1
             
-            print(f"\n🔄 Processing subset {subset_num}/{total_subsets}")
+            print(f"\nProcessing subset {subset_num}/{total_subsets}")
             
             try:
                 # Download and read
                 ids, texts, metadata, paths = self.process_subset(subset)
                 
                 if not texts:
-                    print(f"   ⚠️ No texts downloaded, skipping")
+                    print(f"No texts downloaded, skipping")
                     continue
                 
                 # Generate embeddings
@@ -420,7 +420,7 @@ class ChunkUploader:
                     self.stats.update_file(file_name, processed=len(failed_items), failed=len(failed_items))
                 
                 if not good_items:
-                    print(f"   ⚠️ No successful embeddings")
+                    print(f"No successful embeddings")
                     cleanup_files(paths)
                     continue
                 
@@ -434,11 +434,11 @@ class ChunkUploader:
                     success, failed_ids = self.uploader.upload_batch(batch_ids, batch_vectors, batch_meta)
                     
                     if success:
-                        print(f"   ✅ Batch uploaded: {len(batch_ids)} chunks")
+                        print(f"Batch uploaded: {len(batch_ids)} chunks")
                         self.stats.update_global(uploaded=len(batch_ids), succeeded=len(batch_ids), processed=len(batch_ids))
                         self.stats.update_file(file_name, processed=len(batch_ids), succeeded=len(batch_ids))
                     else:
-                        print(f"   ❌ Batch upload failed")
+                        print(f"Batch upload failed")
                         self.stats.add_failed_ids(failed_ids or batch_ids)
                         self.stats.update_global(failed=len(batch_ids), processed=len(batch_ids))
                         self.stats.update_file(file_name, processed=len(batch_ids), failed=len(batch_ids))
@@ -454,12 +454,12 @@ class ChunkUploader:
                 self.stats.write_stats()
                 
             except Exception as e:
-                print(f"   ❌ Error processing subset: {e}")
+                print(f"Error processing subset: {e}")
                 self.gpu_manager.clear_cache()
                 continue
         
         # Final summary
-        print("\n🎉 S3 upload complete")
+        print("\nS3 upload complete")
         self.gpu_manager.print_memory_stats("Final")
         self.stats.print_summary()
         self.stats.print_validation()

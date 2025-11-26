@@ -28,14 +28,6 @@ export CHUNKS_FOLDER="/path/to/json/files"
 python main.py
 ```
 
-## Upload to 'try' Collection
-
-```bash
-export QDRANT_URL="..."
-export QDRANT_API_KEY="..."
-export S3_CHUNKS_PATH="s3://bucket/chunks/"
-python upload_to_try.py
-```
 
 ## Configuration
 

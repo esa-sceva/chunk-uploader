@@ -25,13 +25,13 @@ def main():
     
     # Validate inputs
     if not db_url or not db_api_key:
-        print("❌ Error: QDRANT_URL and QDRANT_API_KEY must be set")
+        print("Error: QDRANT_URL and QDRANT_API_KEY must be set")
         print("   export QDRANT_URL='https://your-instance:6333'")
         print("   export QDRANT_API_KEY='your-api-key'")
         sys.exit(1)
     
     if not chunks_folder and not s3_chunks_path:
-        print("❌ Error: Either CHUNKS_FOLDER or S3_CHUNKS_PATH must be set")
+        print("Error: Either CHUNKS_FOLDER or S3_CHUNKS_PATH must be set")
         print("   export CHUNKS_FOLDER='/path/to/json/files'")
         print("   OR")
         print("   export S3_CHUNKS_PATH='s3://bucket/path/'")
@@ -47,19 +47,19 @@ def main():
         skip_first_chunks=skip_first_chunks
     )
     
-    print("🚀 Chunk Uploader")
+    print("Chunk Uploader")
     print("=" * 50)
-    print(f"🤖 Model: {config.embedding.model_name}")
+    print(f"Model: {config.embedding.model_name}")
     print(f"   Type: {config.embedding.model_type}")
-    print(f"📊 Score threshold: {config.upload.score_threshold}")
-    print(f"⏭️ Skip first chunks: {config.upload.skip_first_chunks}")
-    print(f"📦 Batch size: {config.upload.batch_size}")
-    print(f"📦 Subset size: {config.upload.subset_size}")
+    print(f"Score threshold: {config.upload.score_threshold}")
+    print(f"Skip first chunks: {config.upload.skip_first_chunks}")
+    print(f"Batch size: {config.upload.batch_size}")
+    print(f"Subset size: {config.upload.subset_size}")
     
     if s3_chunks_path:
-        print(f"📂 S3 path: {s3_chunks_path}")
+        print(f"S3 path: {s3_chunks_path}")
     else:
-        print(f"📂 Chunks folder: {chunks_folder}")
+        print(f"Chunks folder: {chunks_folder}")
     print()
     
     # Create uploader and run

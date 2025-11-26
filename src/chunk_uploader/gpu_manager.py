@@ -45,7 +45,7 @@ class GPUManager:
             return False
         
         stage_prefix = f"[{stage}] " if stage else ""
-        print(f"   🎮 {stage_prefix}GPU Memory: "
+        print(f"{stage_prefix}GPU Memory: "
               f"{stats['allocated_gb']:.1f}GB allocated, "
               f"{stats['reserved_gb']:.1f}GB reserved "
               f"({stats['usage_percent']:.1f}% of {stats['total_gb']:.1f}GB)")
@@ -62,8 +62,8 @@ class GPUManager:
         threshold_percent = self.memory_threshold * 100
         
         if usage > threshold_percent:
-            print(f"   ⚠️ High GPU memory usage: {usage:.2%}")
-            print(f"   🧹 Clearing GPU cache...")
+            print(f"High GPU memory usage: {usage:.2%}")
+            print(f"Clearing GPU cache...")
             self.clear_cache()
             return True
         
@@ -74,10 +74,10 @@ class GPUManager:
         if not self.cuda_available:
             return
         
-        print(f"⏳ Monitoring GPU for {delay_seconds}s...")
+        print(f"Monitoring GPU for {delay_seconds}s...")
         time.sleep(delay_seconds)
         self.clear_cache()
-        print(f"🧹 GPU cache cleared")
+        print(f"GPU cache cleared")
     
     def get_device_info(self):
         """Get GPU device information."""
@@ -93,11 +93,11 @@ class GPUManager:
     def print_device_info(self):
         """Print GPU device information."""
         if not self.cuda_available:
-            print("⚠️ CUDA not available - operations will run on CPU")
+            print("CUDA not available - operations will run on CPU")
             return
         
         info = self.get_device_info()
-        print(f"🔍 GPU Info:")
+        print(f"GPU Info:")
         print(f"   Device count: {info['device_count']}")
         print(f"   Current device: {info['current_device']}")
         print(f"   Device name: {info['device_name']}")
