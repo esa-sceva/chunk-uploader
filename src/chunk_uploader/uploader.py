@@ -61,6 +61,9 @@ class ChunkUploader:
             collection_name=config.database.collection_name,
             score_threshold=config.upload.score_threshold
         )
+        
+        # Initialize counter for incremental IDs
+        self.chunk_counter = 0
     
     def _test_embedding(self):
         """Test embedding generation."""
@@ -146,6 +149,36 @@ class ChunkUploader:
         self.gpu_manager.clear_cache()
         return vectors
     
+    def _enrich_metadata(self, metadata: dict, content: str) -> dict:
+        """
+        Enrich metadata with additional fields before uploading to Qdrant.
+        Based on upload_text_fast.py fields.
+        """
+        enriched = metadata.copy()
+        
+        # Add incremental ID
+        enriched["id"] = self.chunk_counter
+        self.chunk_counter += 1
+        
+        # Rename source_url to url if it exists
+        if "source_url" in enriched:
+            enriched["url"] = enriched.pop("source_url")
+        
+        # Add scholarly metadata fields
+        enriched["doi"] = None
+        enriched["title"] = None
+        enriched["journal"] = None
+        enriched["publisher"] = enriched.get("source_json_file", "").replace(".json", "")
+        enriched["reference_count"] = 0
+        enriched["n_citations"] = 0
+        enriched["influential_citation_count"] = 0
+        enriched["header"] = []
+        
+        # Add content
+        enriched["content"] = content
+        
+        return enriched
+    
     def process_subset(self, chunk_subset: List[ChunkMetadata], local_dir: str = "downloads") -> tuple:
         """Process a subset of chunks: download, read, prepare for embedding."""
         # Download files
@@ -215,12 +248,12 @@ class ChunkUploader:
                 # Generate embeddings
                 vectors = self._embed_texts_safe(texts, batch_size=8)
                 
-                # Filter successful embeddings
-                good_items = [
-                    (uid, vec, meta)
-                    for uid, vec, meta in zip(ids, vectors, metadata)
-                    if vec is not None
-                ]
+                # Filter successful embeddings and enrich metadata
+                good_items = []
+                for uid, vec, meta, text in zip(ids, vectors, metadata, texts):
+                    if vec is not None:
+                        enriched_meta = self._enrich_metadata(meta, text)
+                        good_items.append((uid, vec, enriched_meta))
                 
                 failed_items = [uid for uid, vec, _ in zip(ids, vectors, metadata) if vec is None]
                 
@@ -372,12 +405,12 @@ class ChunkUploader:
                 # Generate embeddings
                 vectors = self._embed_texts_safe(texts, batch_size=8)
                 
-                # Filter successful embeddings
-                good_items = [
-                    (uid, vec, meta)
-                    for uid, vec, meta in zip(ids, vectors, metadata)
-                    if vec is not None
-                ]
+                # Filter successful embeddings and enrich metadata
+                good_items = []
+                for uid, vec, meta, text in zip(ids, vectors, metadata, texts):
+                    if vec is not None:
+                        enriched_meta = self._enrich_metadata(meta, text)
+                        good_items.append((uid, vec, enriched_meta))
                 
                 failed_items = [uid for uid, vec, _ in zip(ids, vectors, metadata) if vec is None]
                 

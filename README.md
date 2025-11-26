@@ -34,16 +34,17 @@ chunk-uploader/
 │   ├── stats_tracker.py     # Statistics tracking
 │   ├── gpu_manager.py       # GPU memory management
 │   └── uploader.py          # Main orchestration
+|
 ├── config/
 │   └── config_qwen.yaml     # Main configuration
+|
 ├── scripts/
 │   └── recreate_collection.py  # Recreate Qdrant collection
+|
 ├── examples/
 │   └── example_usage.py     # Code examples
-├── legacy/
-│   └── chunk_uploader_main.py  # Original script (preserved)
+|
 ├── main.py                  # Main entry point
-├── upload_to_try.py         # Quick upload script
 └── requirements.txt         # Dependencies
 ```
 
@@ -53,7 +54,7 @@ Edit `config/config_qwen.yaml`:
 
 ```yaml
 database:
-  collection_name: "try"  # Your collection name
+  collection_name: "your-collection-name"  # Your collection name
 
 embedding:
   model_name: "Qwen/Qwen3-Embedding-4B"  # Embedding model
@@ -66,6 +67,59 @@ upload_params:
   batch_size: 10000
   vector_size: 2560  # 2560 for Qwen-4B, 1024 for Qwen-0.6B, 768 for NASA
 ```
+
+## Metadata Fields
+
+Each chunk uploaded to Qdrant is automatically enriched with comprehensive metadata (if available in input `json` file)
+
+### Core Fields (Auto-generated)
+- **`id`** (int) - Unique incremental ID (0, 1, 2, ...)
+- **`content`** (str) - Full text content of the chunk
+- **`url`** (str) - Source URL (renamed from source_url)
+- **`publisher`** (str) - Publisher name (extracted from source_json_file)
+
+### Source Fields (From metadata)
+- **`chunk_name`** (str) - Name of the chunk file (e.g., "chunk_001.md")
+- **`original_file_name`** (str) - Original document filename
+- **`sub_folder`** (str) - Subfolder/category (e.g., "arxiv")
+- **`source_json_file`** (str) - Original JSON metadata file
+- **`score`** (float) - Quality/relevance score
+
+### Scholarly Metadata (Placeholders for future enrichment)
+- **`doi`** (null) - Digital Object Identifier
+- **`title`** (null) - Document title
+- **`journal`** (null) - Journal name
+- **`reference_count`** - Number of references
+- **`n_citations`** - Citation count
+- **`influential_citation_count`** - Influential citations count
+- **`header`** - Document headers/sections
+
+### Example Qdrant Payload
+
+```json
+{
+  "id": 12345,
+  "content": "This is the full text content of the chunk...",
+  "chunk_name": "chunk_001.md",
+  "original_file_name": "document.pdf",
+  "sub_folder": "arxiv",
+  "url": "https://arxiv.org/abs/1234.5678",
+  "publisher": "arxiv",
+  "source_json_file": "arxiv.json",
+  "score": 0.95,
+  "doi": null,
+  "title": null,
+  "journal": null,
+  "reference_count": 0,
+  "n_citations": 0,
+  "influential_citation_count": 0,
+  "header": []
+}
+```
+
+**Note:** Scholarly metadata fields are placeholders that can be populated later using external APIs (e.g., Crossref, Semantic Scholar). This allows fast initial upload followed by gradual enrichment.
+
+See **`METADATA_FIELDS.md`** for complete documentation.
 
 ## Usage
 
@@ -201,23 +255,23 @@ This creates a collection with:
 The uploader shows real-time progress:
 
 ```
-🚀 Chunk Uploader
-🤖 Model: Qwen/Qwen3-Embedding-4B
-📊 Vector dimensions: 2560
-📂 S3 path: s3://bucket/chunks/
+Chunk Uploader
+Model: Qwen/Qwen3-Embedding-4B
+Vector dimensions: 2560
+S3 path: s3://bucket/chunks/
 
-📂 Found 1000 markdown files in S3
+Found 1000 markdown files in S3
 
-🔄 Processing batch 1/10: 100 files
-⬇️ Downloaded 100 files in 3.2s
-🧠 Generating embeddings...
-✅ Embeddings generated in 15.8s
-📤 Uploading to Qdrant...
-✅ Uploaded 100 vectors
+Processing batch 1/10: 100 files
+Downloaded 100 files in 3.2s
+Generating embeddings...
+Embeddings generated in 15.8s
+Uploading to Qdrant...
+Uploaded 100 vectors
 
-📊 Final summary:
-   🎯 Successfully uploaded: 1000 chunks
-   📊 Upload success rate: 100.0%
+Final summary:
+  Successfully uploaded: 1000 chunks
+  Upload success rate: 100.0%
 ```
 
 Statistics saved to: `upload_stats_pod_XXXXX_TIMESTAMP.json`
@@ -293,33 +347,3 @@ from chunk_uploader import ChunkUploader
 3. **Network** - Fast internet for S3 downloads
 4. **Model Choice** - Smaller models = faster processing
 
-## AWS Configuration
-
-Make sure AWS credentials are configured:
-
-```bash
-aws configure
-```
-
-Or set environment variables:
-```bash
-export AWS_ACCESS_KEY_ID="your-key"
-export AWS_SECRET_ACCESS_KEY="your-secret"
-export AWS_DEFAULT_REGION="us-east-1"
-```
-
-## Support
-
-- **Examples**: `examples/example_usage.py`
-- **Legacy Code**: `legacy/chunk_uploader_main.py` (original script, still works)
-- **Additional Docs**: `docs/archive/` (detailed guides)
-
-## License
-
-[Add your license]
-
----
-
-**Version**: 2.0.0  
-**Status**: Production Ready  
-**Python**: 3.8+
