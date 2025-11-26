@@ -1,0 +1,22 @@
+upload_params:
+  batch_size : 10000 # batch size for Qdrant data upload
+  vector_size : 2560 # Qdrant vector size   #2560 for qwen # 768 for indus
+
+
+chunk_params:
+  num_of_docs: 10 #documents to be processed
+  chunker_type: 'hierarchical' # recurcive or hierarchical
+
+database:
+  # Qdrant collection name
+  collection_name: "try"
+
+embedding:
+  model_name: "Qwen/Qwen3-Embedding-4B"
+  #model_name: "nasa-impact/nasa-smd-ibm-st-v2" # embedding model to be used for vectors
+  #model_name: "Tulsikumar/indus-sde-st-v0.2"
+  type: 'sentence' # type sentence,vllm and transformer for qwen only
+  normalize: true
+
+
+cluster: "SatcomLLM"
