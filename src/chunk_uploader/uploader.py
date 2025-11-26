@@ -37,7 +37,7 @@ class ChunkUploader:
         self.gpu_manager = GPUManager(memory_threshold=config.upload.gpu_memory_threshold)
         
         # Initialize embedding model
-        print(f"🤖 Loading embedding model...")
+        print(f"Loading embedding model...")
         self.gpu_manager.print_device_info()
         
         self.embedder, self.vector_size = EmbeddingModelFactory.create(
@@ -46,8 +46,8 @@ class ChunkUploader:
             normalize=config.embedding.normalize
         )
         
-        print(f"✅ Embedding model loaded: {config.embedding.model_name}")
-        print(f"📊 Vector dimensions: {self.vector_size}")
+        print(f"Embedding model loaded: {config.embedding.model_name}")
+        print(f"Vector dimensions: {self.vector_size}")
         
         # Test embedding
         self._test_embedding()
@@ -70,19 +70,19 @@ class ChunkUploader:
         if not self.gpu_manager.is_available():
             return
         
-        print(f"🧪 Testing GPU embedding...")
+        print(f"Testing GPU embedding...")
         try:
             start = time.time()
             test_emb = self.embedder.embed_documents(["Test sentence for GPU verification."])
             duration = time.time() - start
-            print(f"✅ Test embedding successful in {duration:.3f}s")
-            print(f"🔍 Embedding shape: {len(test_emb)} x {len(test_emb[0]) if test_emb else 0}")
+            print(f"Test embedding successful in {duration:.3f}s")
+            print(f"Embedding shape: {len(test_emb)} x {len(test_emb[0]) if test_emb else 0}")
         except Exception as e:
-            print(f"❌ Test embedding failed: {e}")
+            print(f"Test embedding failed: {e}")
     
     def generate_embeddings(self, texts: List[str]) -> List[List[float]]:
         """Generate embeddings with memory management."""
-        print(f"🧠 Generating embeddings for {len(texts)} texts...")
+        print(f"Generating embeddings for {len(texts)} texts...")
         
         self.gpu_manager.print_memory_stats("Before Embedding")
         self.gpu_manager.check_and_clear_if_needed()
@@ -91,7 +91,7 @@ class ChunkUploader:
         embeddings = self.embedder.embed_documents(texts)
         duration = time.time() - start
         
-        print(f"✅ Embeddings generated in {duration:.3f}s")
+        print(f"Embeddings generated in {duration:.3f}s")
         self.gpu_manager.print_memory_stats("After Embedding")
         
         return embeddings
@@ -112,7 +112,7 @@ class ChunkUploader:
                 else:
                     batch_size = min(batch_size, 12)
         
-        print(f"   🧠 Using embedding batch size: {batch_size}")
+        print(f"Using embedding batch size: {batch_size}")
         
         for i in range(0, len(texts), batch_size):
             batch = texts[i:i+batch_size]
@@ -130,19 +130,19 @@ class ChunkUploader:
                     success = True
                     break
                 except Exception as e:
-                    print(f"   ⚠️ Batch {i}-{i+len(batch)-1} attempt {attempt+1} failed: {e}")
+                    print(f"Batch {i}-{i+len(batch)-1} attempt {attempt+1} failed: {e}")
                     self.gpu_manager.clear_cache()
                     time.sleep(1 + attempt * 2)
             
             if not success:
                 # Fallback to individual documents
-                print(f"   🔄 Processing documents individually...")
+                print(f"Processing documents individually...")
                 for j, doc in enumerate(batch):
                     try:
                         vec = self.generate_embeddings([doc])[0]
                         vectors.append(vec)
                     except Exception as e:
-                        print(f"      ❌ Document {i+j} failed: {e}")
+                        print(f"   Document {i+j} failed: {e}")
                         vectors.append(None)
                         self.gpu_manager.clear_cache()
         
@@ -200,7 +200,7 @@ class ChunkUploader:
                     all_metadata.append(chunk.metadata)
                     local_paths.append(local_path)
                 except Exception as e:
-                    print(f"⚠️ Error reading {local_path}: {e}")
+                    print(f"Error reading {local_path}: {e}")
         
         return all_ids, all_texts, all_metadata, local_paths
     
@@ -235,14 +235,14 @@ class ChunkUploader:
             subset = chunk_metadata[subset_idx:subset_idx + subset_size]
             subset_num = subset_idx // subset_size + 1
             
-            print(f"\n🔄 Processing subset {subset_num}/{total_subsets}")
+            print(f"\nProcessing subset {subset_num}/{total_subsets}")
             
             try:
                 # Download and read
                 ids, texts, metadata, paths = self.process_subset(subset)
                 
                 if not texts:
-                    print(f"   ⚠️ No texts downloaded, skipping")
+                    print(f"   No texts downloaded, skipping")
                     continue
                 
                 # Generate embeddings
@@ -263,7 +263,7 @@ class ChunkUploader:
                     self.stats.update_file(file_name, processed=len(failed_items), failed=len(failed_items))
                 
                 if not good_items:
-                    print(f"   ⚠️ No successful embeddings")
+                    print(f"   No successful embeddings")
                     cleanup_files(paths)
                     continue
                 
@@ -277,11 +277,11 @@ class ChunkUploader:
                     success, failed_ids = self.uploader.upload_batch(batch_ids, batch_vectors, batch_meta)
                     
                     if success:
-                        print(f"   ✅ Batch uploaded: {len(batch_ids)} chunks")
+                        print(f"   Batch uploaded: {len(batch_ids)} chunks")
                         self.stats.update_global(uploaded=len(batch_ids), succeeded=len(batch_ids), processed=len(batch_ids))
                         self.stats.update_file(file_name, processed=len(batch_ids), succeeded=len(batch_ids))
                     else:
-                        print(f"   ❌ Batch upload failed")
+                        print(f"   Batch upload failed")
                         self.stats.add_failed_ids(failed_ids or batch_ids)
                         self.stats.update_global(failed=len(batch_ids), processed=len(batch_ids))
                         self.stats.update_file(file_name, processed=len(batch_ids), failed=len(batch_ids))
@@ -297,13 +297,13 @@ class ChunkUploader:
                 self.stats.write_stats()
                 
             except Exception as e:
-                print(f"   ❌ Error processing subset: {e}")
+                print(f"   Error processing subset: {e}")
                 self.gpu_manager.clear_cache()
                 continue
     
     def upload_all(self):
         """Upload all chunks from the configured folder."""
-        print(f"🚀 Starting upload process")
+        print(f"Starting upload process")
         print(f"   Pod ID: {self.pod_id}")
         print(f"   Collection: {self.config.database.collection_name}")
         print(f"   Batch size: {self.config.upload.batch_size}")
@@ -311,7 +311,7 @@ class ChunkUploader:
         
         # Check collection health
         if not self.uploader.check_collection_health():
-            print("❌ Collection health check failed")
+            print("Collection health check failed")
             return
         
         self.gpu_manager.print_memory_stats("Initial")
@@ -323,21 +323,21 @@ class ChunkUploader:
         ])
         
         for file_name in json_files:
-            print(f"\n📂 Processing file: {file_name}")
+            print(f"\nProcessing file: {file_name}")
             full_path = os.path.join(self.config.chunks_folder, file_name)
             
             try:
                 self.upload_file(full_path)
-                print(f"✅ Completed file {file_name}")
+                print(f"Completed file {file_name}")
             except Exception as e:
-                print(f"❌ Error processing file {file_name}: {e}")
+                print(f"Error processing file {file_name}: {e}")
                 continue
             
             time.sleep(1.0)  # Delay between files
             self.gpu_manager.clear_cache()
         
         # Final summary
-        print("\n🎉 All uploads complete")
+        print("\nAll uploads complete")
         self.gpu_manager.print_memory_stats("Final")
         self.stats.print_summary()
         self.stats.print_validation()
