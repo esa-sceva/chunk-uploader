@@ -347,3 +347,8 @@ from chunk_uploader import ChunkUploader
 3. **Network** - Fast internet for S3 downloads
 4. **Model Choice** - Smaller models = faster processing
 
+---
+
+## License
+
+This project is released under the Apache 2.0 License. See the [LICENSE](LICENSE) file for more details.
